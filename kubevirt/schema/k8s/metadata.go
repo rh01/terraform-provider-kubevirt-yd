@@ -2,8 +2,6 @@ package k8s
 
 import (
 	"fmt"
-	"net/url"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
@@ -193,37 +191,37 @@ func AppendPatchOps(keyPrefix, pathPrefix string, resourceData *schema.ResourceD
 	return ops
 }
 
-func removeInternalKeys(m map[string]string, d map[string]interface{}) map[string]string {
-	for k := range m {
-		if isInternalKey(k) && !isKeyInMap(k, d) {
-			delete(m, k)
-		}
-	}
-	return m
-}
+// func removeInternalKeys(m map[string]string, d map[string]interface{}) map[string]string {
+// 	for k := range m {
+// 		if isInternalKey(k) && !isKeyInMap(k, d) {
+// 			delete(m, k)
+// 		}
+// 	}
+// 	return m
+// }
 
-func isKeyInMap(key string, d map[string]interface{}) bool {
-	if d == nil {
-		return false
-	}
-	for k := range d {
-		if k == key {
-			return true
-		}
-	}
-	return false
-}
+// func isKeyInMap(key string, d map[string]interface{}) bool {
+// 	if d == nil {
+// 		return false
+// 	}
+// 	for k := range d {
+// 		if k == key {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
 
-func isInternalKey(annotationKey string) bool {
-	u, err := url.Parse("//" + annotationKey)
-	if err == nil && strings.HasSuffix(u.Hostname(), "kubernetes.io") {
-		return true
-	}
+// func isInternalKey(annotationKey string) bool {
+// 	u, err := url.Parse("//" + annotationKey)
+// 	if err == nil && strings.HasSuffix(u.Hostname(), "kubernetes.io") {
+// 		return true
+// 	}
 
-	// Specific to DaemonSet annotations, generated & controlled by the server.
-	if strings.Contains(annotationKey, "deprecated.daemonset.template.generation") {
-		return true
-	}
+// 	// Specific to DaemonSet annotations, generated & controlled by the server.
+// 	if strings.Contains(annotationKey, "deprecated.daemonset.template.generation") {
+// 		return true
+// 	}
 
-	return false
-}
+// 	return false
+// }
