@@ -4,6 +4,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils"
+	api "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -166,18 +167,18 @@ func expandResourceRequirements(l []interface{}) (*v1.ResourceRequirements, erro
 	return obj, nil
 }
 
-// func expandPersistentVolumeAccessModes(s []interface{}) []api.PersistentVolumeAccessMode {
-// 	out := make([]api.PersistentVolumeAccessMode, len(s), len(s))
-// 	for i, v := range s {
-// 		out[i] = api.PersistentVolumeAccessMode(v.(string))
-// 	}
-// 	return out
-// }
+func expandPersistentVolumeAccessModes(s []interface{}) []api.PersistentVolumeAccessMode {
+	out := make([]api.PersistentVolumeAccessMode, len(s), len(s))
+	for i, v := range s {
+		out[i] = api.PersistentVolumeAccessMode(v.(string))
+	}
+	return out
+}
 
-// func flattenPersistentVolumeAccessModes(in []api.PersistentVolumeAccessMode) *schema.Set {
-// 	var out = make([]interface{}, len(in), len(in))
-// 	for i, v := range in {
-// 		out[i] = string(v)
-// 	}
-// 	return schema.NewSet(schema.HashString, out)
-// }
+func flattenPersistentVolumeAccessModes(in []api.PersistentVolumeAccessMode) *schema.Set {
+	var out = make([]interface{}, len(in), len(in))
+	for i, v := range in {
+		out[i] = string(v)
+	}
+	return schema.NewSet(schema.HashString, out)
+}

@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/schema/k8s"
 	api "k8s.io/api/core/v1"
 	utilValidation "k8s.io/apimachinery/pkg/util/validation"
 	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
@@ -172,27 +171,13 @@ func expandProbe(probe []interface{}) *kubevirtapiv1.Probe {
 
 	result := &kubevirtapiv1.Probe{}
 
-	in := probe[0].(map[string]interface{})
-
-	if v, ok := in["http_get"].([]interface{}); ok && len(v) > 0 {
-		result.HTTPGet = k8s.ExpandHTTPGet(v)
-	}
-	if v, ok := in["tcp_socket"].([]interface{}); ok && len(v) > 0 {
-		result.TCPSocket = k8s.ExpandTCPSocket(v)
-	}
+	_ = probe[0].(map[string]interface{})
 
 	return result
 }
 
 func flattenProbe(in kubevirtapiv1.Probe) []interface{} {
 	att := make(map[string]interface{})
-
-	if in.HTTPGet != nil {
-		att["http_get"] = k8s.FlattenHTTPGet(in.HTTPGet)
-	}
-	if in.TCPSocket != nil {
-		att["tcp_socket"] = k8s.FlattenTCPSocket(in.TCPSocket)
-	}
 
 	return []interface{}{att}
 }
