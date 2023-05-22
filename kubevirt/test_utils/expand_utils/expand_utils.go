@@ -2,8 +2,8 @@ package expand_utils
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	test_entities "github.com/kubevirt/terraform-provider-kubevirt/kubevirt/test_utils/entities"
-	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
+	test_entities "github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/test_utils/entities"
+	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils"
 
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
-	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt"
+	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt"
 )
 
 func main() {

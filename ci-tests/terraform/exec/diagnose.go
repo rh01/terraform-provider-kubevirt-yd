@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/kubevirt/terraform-provider-kubevirt/ci-tests/terraform/exec/diagnostics"
+	"github.com/rh01/terraform-provider-kubevirt-yd/ci-tests/terraform/exec/diagnostics"
 )
 
 // Diagnose accepts an error from terraform runs and tries to diagnose the

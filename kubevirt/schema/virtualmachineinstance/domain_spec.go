@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
+	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils"
 	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
 )
 

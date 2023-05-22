@@ -1,4 +1,4 @@
-module github.com/kubevirt/terraform-provider-kubevirt
+module github.com/rh01/terraform-provider-kubevirt-yd
 
 go 1.16
 

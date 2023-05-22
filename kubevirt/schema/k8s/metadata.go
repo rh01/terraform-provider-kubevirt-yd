@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
-	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils/patch"
+	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils"
+	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils/patch"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
