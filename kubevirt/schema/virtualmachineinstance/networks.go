@@ -66,11 +66,10 @@ func networksSchema() *schema.Schema {
 	fields := networkFields()
 
 	return &schema.Schema{
-		Type: schema.TypeList,
-
+		Type:        schema.TypeList,
 		Description: fmt.Sprintf("List of networks that can be attached to a vm's virtual interface."),
 		Optional:    true,
-		MaxItems:    1,
+		// MaxItems:    1,
 		Elem: &schema.Resource{
 			Schema: fields,
 		},
@@ -94,7 +93,7 @@ func expandNetworks(networks []interface{}) []kubevirtapiv1.Network {
 		if v, ok := in["network_source"].([]interface{}); ok {
 			result[i].NetworkSource = expandNetworkSource(v)
 		}
-		
+
 	}
 
 	return result

@@ -126,6 +126,11 @@ func domainSpecFields() map[string]*schema.Schema {
 									Description: "Interface model of the interface as well as a reference to the associated networks.",
 									Optional:    true,
 								},
+								"boot_order": {
+									Type:        schema.TypeInt,
+									Description: "BootOrder specifies the boot order of the interface. Defaults to 0.",
+									Optional:    true,
+								},
 								"interface_binding_method": {
 									Type: schema.TypeString,
 									ValidateFunc: validation.StringInSlice([]string{
@@ -313,9 +318,16 @@ func expandInterfaces(interfaces []interface{}) []kubevirtapiv1.Interface {
 		if v, ok := in["name"].(string); ok {
 			result[i].Name = v
 		}
+		if v, ok := in["boot_order"].(uint); ok {
+			result[i].BootOrder = &v
+		}
 		if v, ok := in["model"].(string); ok {
 			result[i].Model = v
 		}
+		if v, ok := in["mac_address"].(string); ok {
+			result[i].MacAddress = v
+		}
+
 		if v, ok := in["interface_binding_method"].(string); ok {
 			result[i].InterfaceBindingMethod = expandInterfaceBindingMethod(v)
 		}
@@ -421,9 +433,7 @@ func flattenInterfaces(in []kubevirtapiv1.Interface) []interface{} {
 
 		c["name"] = v.Name
 		c["interface_binding_method"] = flattenInterfaceBindingMethod(v.InterfaceBindingMethod)
-		// switch v.InterfaceBindingMethod {
-		// 	case kubevirtapiv1.Interfac
-		// }
+		c["boot_order"] = v.BootOrder
 		c["model"] = v.Model
 
 		att[i] = c
