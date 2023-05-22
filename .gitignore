@@ -1,0 +1,10 @@
+terraform-provider-kubevirt
+*swp
+_examples/**/.terraform
+_ci-configs
+build/_output
+_examples/
+.vscode/
+*.zip
+.vscode/
+dist/
