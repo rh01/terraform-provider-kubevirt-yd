@@ -126,6 +126,32 @@ func domainSpecFields() map[string]*schema.Schema {
 									Description: "BootOrder specifies the boot order of the interface. Defaults to 0.",
 									Optional:    true,
 								},
+
+								"port": {
+									Type:        schema.TypeList,
+									Description: "Port specifies the port number of the interface. Defaults to 0.",
+									// MaxItems: 1,
+									Optional: true,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											"name": {
+												Type:        schema.TypeString,
+												Description: "Name for the port that can be referred to by services.",
+												Optional:    true,
+											},
+											"protocol": {
+												Type:        schema.TypeString,
+												Description: "Protocol for port. Must be UDP or TCP. Defaults to TCP.",
+												Optional:    true,
+											},
+											"port": {
+												Type:        schema.TypeInt,
+												Description: "Number of port to expose for the virtual machine. This must be a valid port number, 0 < x < 65536.",
+												Required:    true,
+											},
+										},
+									},
+								},
 								"model": {
 									Type:        schema.TypeString,
 									Description: "Interface model of the interface as well as a reference to the associated networks.",
@@ -327,6 +353,10 @@ func expandInterfaces(interfaces []interface{}) []kubevirtapiv1.Interface {
 		if v, ok := in["interface_binding_method"].(string); ok {
 			result[i].InterfaceBindingMethod = expandInterfaceBindingMethod(v)
 		}
+		if v, ok := in["port"].([]interface{}); ok {
+			result[i].Ports = expandInterfacePort(v)
+		}
+
 	}
 
 	return result
@@ -432,12 +462,48 @@ func flattenInterfaces(in []kubevirtapiv1.Interface) []interface{} {
 		if v.BootOrder != nil {
 			c["boot_order"] = *v.BootOrder
 		}
+		c["port"] = flattenInterfacePort(v.Ports)
 		c["model"] = v.Model
 
 		att[i] = c
 	}
 
 	return att
+}
+
+func flattenInterfacePort(in []kubevirtapiv1.Port) []interface{} {
+	if len(in) == 0 {
+		return nil
+	}
+
+	res := make([]interface{}, len(in))
+
+	for _, v := range in {
+		c := make(map[string]interface{})
+		c["name"] = v.Name
+		c["protocol"] = v.Protocol
+		c["port"] = v.Port
+		res = append(res, c)
+	}
+
+	return res
+}
+
+func expandInterfacePort(in []interface{}) []kubevirtapiv1.Port {
+	if len(in) == 0 || in[0] == nil {
+		return nil
+	}
+
+	res := make([]kubevirtapiv1.Port, len(in))
+
+	for i, v := range in {
+		in := v.(map[string]interface{})
+		res[i].Name = in["name"].(string)
+		res[i].Protocol = in["protocol"].(string)
+		res[i].Port = in["port"].(int32)
+	}
+
+	return res
 }
 
 func flattenInterfaceBindingMethod(in kubevirtapiv1.InterfaceBindingMethod) string {
