@@ -3,7 +3,7 @@ package k8s
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
 	v1 "k8s.io/api/core/v1"
 )
 

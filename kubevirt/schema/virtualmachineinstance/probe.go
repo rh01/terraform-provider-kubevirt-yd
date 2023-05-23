@@ -6,61 +6,121 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	api "k8s.io/api/core/v1"
-	utilValidation "k8s.io/apimachinery/pkg/util/validation"
+	k8sv1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
 )
 
 func probeFields() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"http_get": {
+		"initial_delay_seconds": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "InitialDelaySeconds is the time to wait before starting to probe after pod startup. This is only applicable for Readiness and Liveness probes, ignored for HTTP probes.",
+			Default:     600,
+		},
+		"period_seconds": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			Description:  "PeriodSeconds specifies how often (in seconds between probes) to perform the probe.",
+			Default:      60,
+			ValidateFunc: validation.IntBetween(1, 300),
+			// TODO: https://github.com/kubevirt/client-go/issues/8
+			// Deprecated: true,
+		},
+		"failure_threshold": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			Description:  "FailureThreshold specifies the number of consecutive failures before a pod is marked failed. It is only applicable for Readiness and Liveness probes, ignored for HTTP probes.",
+			Default:      3,
+			ValidateFunc: validation.IntBetween(1, 10),
+			// TODO: https://github.com/kubevirt/client-go/issues/8
+			// Deprecated: true,
+			//Removed:      true,
+		},
+		"success_threshold": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			Description:  "SuccessThreshold specifies the number of consecutive successes before the probe is considered successful. It is only applicable for Readiness and Liveness probes, ignoredConfigMode: Readiness and Liveness probes, ignored for HTTP probes.",
+			Default:      1,
+			ValidateFunc: validation.IntBetween(1, 10),
+		},
+
+		"tcp_socket": {
 			Type:        schema.TypeList,
 			Optional:    true,
 			MaxItems:    1,
-			Description: "Specifies the http request to perform.",
+			Description: "TCP socket probe",
 			Elem: &schema.Resource{
+
 				Schema: map[string]*schema.Schema{
+					"port": {
+						Type:        schema.TypeInt,
+						Required:    true,
+						Description: "Port number",
+					},
 					"host": {
 						Type:        schema.TypeString,
 						Optional:    true,
-						Description: `Host name to connect to, defaults to the pod IP. You probably want to set "Host" in httpHeaders instead.`,
+						Description: "Host name",
 					},
+				},
+			},
+		},
+
+		"http_get": {
+			Type: schema.TypeList,
+			//Optional:    true,
+			MaxItems: 1,
+			Optional: true,
+			Elem: &schema.Resource{
+
+				Schema: map[string]*schema.Schema{
 					"path": {
 						Type:        schema.TypeString,
+						Description: "Path to access on the HTTP server.",
 						Optional:    true,
-						Description: `Path to access on the HTTP server.`,
+						Default:     "/",
+					},
+					"port": {
+						Type:        schema.TypeInt,
+						Description: "Number or name of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.",
+						Optional:    true,
+						Default:     80,
+					},
+					"host": {
+						Type:        schema.TypeString,
+						Description: "Host name to connect to, defaults to the pod IP.",
+						Optional:    true,
+						Default:     "",
 					},
 					"scheme": {
 						Type:        schema.TypeString,
+						Description: "Scheme to use for connecting to the host. Defaults to HTTP.",
 						Optional:    true,
-						Default:     string(api.URISchemeHTTP),
-						Description: `Scheme to use for connecting to the host.`,
+						Default:     "HTTP",
 						ValidateFunc: validation.StringInSlice([]string{
-							string(api.URISchemeHTTP),
-							string(api.URISchemeHTTPS),
+							"HTTP",
+							"HTTPS",
 						}, false),
 					},
-					"port": {
-						Type:         schema.TypeString,
-						Optional:     true,
-						ValidateFunc: validatePortNumOrName,
-						Description:  `Name or number of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.`,
-					},
-					"http_header": {
+					"http_headers": {
 						Type:        schema.TypeList,
+						Description: "HTTPHeader describes a custom header to be used in HTTP probes",
 						Optional:    true,
-						Description: `Scheme to use for connecting to the host.`,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"name": {
 									Type:        schema.TypeString,
-									Optional:    true,
 									Description: "The header field name",
+									Optional:    true,
+									Default:     "",
 								},
 								"value": {
 									Type:        schema.TypeString,
-									Optional:    true,
 									Description: "The header field value",
+									Optional:    true,
+									Default:     "",
 								},
 							},
 						},
@@ -68,83 +128,6 @@ func probeFields() map[string]*schema.Schema {
 				},
 			},
 		},
-		"tcp_socket": {
-			Type:        schema.TypeList,
-			Optional:    true,
-			Description: "TCPSocket specifies an action involving a TCP port. TCP hooks not yet supported",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"port": {
-						Type:         schema.TypeString,
-						Required:     true,
-						ValidateFunc: validatePortNumOrName,
-						Description:  "Number or name of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.",
-					},
-				},
-			},
-		},
-		"initial_delay_seconds": {
-			Type:        schema.TypeInt,
-			Description: "Number of seconds after the VirtualMachineInstance has started before liveness probes are initiated.",
-			Optional:    true,
-		},
-		"timeout_seconds": {
-			Type:        schema.TypeInt,
-			Description: "Number of seconds after which the probe times out.",
-			Optional:    true,
-		},
-		"period_seconds": {
-			Type:        schema.TypeInt,
-			Description: "How often (in seconds) to perform the probe.",
-			Optional:    true,
-		},
-		"success_threshold": {
-			Type:        schema.TypeInt,
-			Description: "Minimum consecutive successes for the probe to be considered successful after having failed.",
-			Optional:    true,
-		},
-		"failure_threshold": {
-			Type:        schema.TypeInt,
-			Description: "Minimum consecutive failures for the probe to be considered failed after having succeeded.",
-			Optional:    true,
-		},
-	}
-}
-
-func validatePortNum(value interface{}, key string) (ws []string, es []error) {
-	errors := utilValidation.IsValidPortNum(value.(int))
-	if len(errors) > 0 {
-		for _, err := range errors {
-			es = append(es, fmt.Errorf("%s %s", key, err))
-		}
-	}
-	return
-}
-
-func validatePortName(value interface{}, key string) (ws []string, es []error) {
-	errors := utilValidation.IsValidPortName(value.(string))
-	if len(errors) > 0 {
-		for _, err := range errors {
-			es = append(es, fmt.Errorf("%s %s", key, err))
-		}
-	}
-	return
-}
-
-func validatePortNumOrName(value interface{}, key string) (ws []string, es []error) {
-	switch value.(type) {
-	case string:
-		intVal, err := strconv.Atoi(value.(string))
-		if err != nil {
-			return validatePortName(value, key)
-		}
-		return validatePortNum(intVal, key)
-	case int:
-		return validatePortNum(value, key)
-
-	default:
-		es = append(es, fmt.Errorf("%s must be defined of type string or int on the schema", key))
-		return
 	}
 }
 
@@ -171,13 +154,193 @@ func expandProbe(probe []interface{}) *kubevirtapiv1.Probe {
 
 	result := &kubevirtapiv1.Probe{}
 
-	_ = probe[0].(map[string]interface{})
+	probeMap := probe[0].(map[string]interface{})
+	if v, ok := probeMap["initial_delay_seconds"]; ok {
+		result.InitialDelaySeconds = int32(v.(int))
+	}
+	if v, ok := probeMap["period_seconds"]; ok {
+		result.PeriodSeconds = int32(v.(int))
+	}
+	if v, ok := probeMap["failure_threshold"]; ok {
+		result.FailureThreshold = int32(v.(int))
+	}
+	if v, ok := probeMap["success_threshold"]; ok {
+		result.SuccessThreshold = int32(v.(int))
+	}
+	if v, ok := probeMap["timeout_seconds"]; ok {
+		result.TimeoutSeconds = int32(v.(int))
+	}
+
+	if v, ok := probeMap["http_get"]; ok {
+		result.HTTPGet = expandHTTPGet(v.([]interface{}))
+	}
+	if v, ok := probeMap["tcp_socket"]; ok {
+		result.TCPSocket = expandTCPSocket(v.([]interface{}))
+	}
+
+	return result
+}
+
+func expandHTTPGet(httpGet []interface{}) *k8sv1.HTTPGetAction {
+	if len(httpGet) == 0 || httpGet[0] == nil {
+		return nil
+	}
+
+	result := &k8sv1.HTTPGetAction{}
+
+	httpGetMap := httpGet
+	if v, ok := httpGetMap[0].(map[string]interface{}); ok {
+		if v, ok := v["path"]; ok {
+			result.Path = v.(string)
+		}
+		if v, ok := v["port"]; ok {
+			switch v.(type) {
+			case string:
+				result.Port = intstr.Parse(v.(string))
+			case int:
+				result.Port = intstr.FromInt(v.(int))
+			}
+		}
+		if v, ok := v["scheme"]; ok {
+			result.Scheme = k8sv1.URIScheme(v.(string))
+			if result.Scheme == "https" {
+				result.Port = intstr.FromInt(443)
+			}
+		}
+		if v, ok := v["http_header"]; ok {
+			result.HTTPHeaders = expandHTTPHeader(v.([]interface{}))
+		}
+	}
+
+	return result
+}
+
+func expandHTTPHeader(httpHeader []interface{}) []k8sv1.HTTPHeader {
+	if len(httpHeader) == 0 || httpHeader[0] == nil {
+		return nil
+	}
+
+	result := make([]k8sv1.HTTPHeader, 0, len(httpHeader))
+
+	for _, h := range httpHeader {
+		header := h.(map[string]interface{})
+		result = append(result, k8sv1.HTTPHeader{
+			Name:  header["name"].(string),
+			Value: header["value"].(string),
+		})
+	}
+
+	return result
+}
+
+func expandTCPSocket(tcpSocket []interface{}) *k8sv1.TCPSocketAction {
+	if len(tcpSocket) == 0 || tcpSocket[0] == nil {
+		return nil
+	}
+
+	result := &k8sv1.TCPSocketAction{}
+
+	tcpSocketMap := tcpSocket
+	if v, ok := tcpSocketMap[0].(map[string]interface{}); ok {
+		if v, ok := v["host"]; ok {
+			result.Host = v.(string)
+		}
+
+		if v, ok := v["port"]; ok {
+			// result.Port = intstr.FromString(v.(string))
+			switch v.(type) {
+			case string:
+				result.Port = intstr.FromString(v.(string))
+			case int:
+				result.Port = intstr.FromInt(v.(int))
+			}
+		}
+	}
 
 	return result
 }
 
 func flattenProbe(in kubevirtapiv1.Probe) []interface{} {
 	att := make(map[string]interface{})
+
+	if in.FailureThreshold != 0 {
+		att["failure_threshold"] = int(in.FailureThreshold)
+	}
+	if in.SuccessThreshold != 0 {
+		att["success_threshold"] = int(in.SuccessThreshold)
+	}
+	if in.PeriodSeconds != 0 {
+		att["period_seconds"] = int(in.PeriodSeconds)
+	}
+	if in.TimeoutSeconds != 0 {
+		att["timeout_seconds"] = int(in.TimeoutSeconds)
+	}
+	if in.HTTPGet != nil {
+		att["http_get"] = flattenHTTPGet(in.HTTPGet)
+	}
+	if in.TCPSocket != nil {
+		att["tcp_socket"] = flattenTCPSocket(in.TCPSocket)
+	}
+	if in.InitialDelaySeconds != 0 {
+		att["initial_delay_seconds"] = int(in.InitialDelaySeconds)
+	}
+
+	return []interface{}{att}
+}
+
+func flattenHTTPGet(in *k8sv1.HTTPGetAction) []interface{} {
+	att := make(map[string]interface{})
+
+	if in.Path != "" {
+		att["path"] = in.Path
+	}
+
+	switch in.Port.Type {
+	case intstr.Int:
+		att["port"] = strconv.Itoa(int(in.Port.IntVal))
+	case intstr.String:
+		att["port"] = in.Port.StrVal
+	}
+
+	if in.Scheme != "" {
+		att["scheme"] = string(in.Scheme)
+	}
+
+	if in.Host != "" {
+		att["host"] = in.Host
+	}
+
+	if len(in.HTTPHeaders) > 0 {
+		att["http_header"] = flattenHTTPHeader(in.HTTPHeaders)
+	}
+
+	return []interface{}{att}
+}
+
+func flattenHTTPHeader(in []k8sv1.HTTPHeader) []interface{} {
+	att := make([]interface{}, 0, len(in))
+
+	for _, h := range in {
+		att = append(att, map[string]interface{}{
+			"name":  h.Name,
+			"value": h.Value,
+		})
+	}
+
+	return att
+}
+
+func flattenTCPSocket(in *k8sv1.TCPSocketAction) []interface{} {
+	att := make(map[string]interface{})
+
+	switch in.Port.Type {
+	case intstr.Int:
+		att["port"] = in.Port.IntValue()
+
+	case intstr.String:
+		att["port"] = in.Port.String()
+
+	}
 
 	return []interface{}{att}
 }

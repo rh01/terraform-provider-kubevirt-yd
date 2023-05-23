@@ -7,11 +7,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kubevirt/terraform-provider-kubevirt/ci-tests/common"
+	"github.com/kubevirt/terraform-provider-kubevirt/ci-tests/terraform/exec"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pborman/uuid"
-	"github.com/rh01/terraform-provider-kubevirt-yd/ci-tests/common"
-	"github.com/rh01/terraform-provider-kubevirt-yd/ci-tests/terraform/exec"
 	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
 )
 

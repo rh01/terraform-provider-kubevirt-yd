@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/kubevirt/terraform-provider-kubevirt/ci-tests/terraform/data"
+	"github.com/kubevirt/terraform-provider-kubevirt/ci-tests/terraform/exec/lineprinter"
 	"github.com/pkg/errors"
-	"github.com/rh01/terraform-provider-kubevirt-yd/ci-tests/terraform/data"
-	"github.com/rh01/terraform-provider-kubevirt-yd/ci-tests/terraform/exec/lineprinter"
 	"github.com/sirupsen/logrus"
 )
 

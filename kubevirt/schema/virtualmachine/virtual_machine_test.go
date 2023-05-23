@@ -6,10 +6,10 @@ import (
 	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/test_utils"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/test_utils"
 
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/test_utils/expand_utils"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/test_utils/flatten_utils"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/test_utils/expand_utils"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/test_utils/flatten_utils"
 
 	"gotest.tools/assert"
 )

@@ -7,10 +7,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/client"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/schema/virtualmachine"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils/patch"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/client"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/schema/virtualmachine"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils/patch"
 	"k8s.io/apimachinery/pkg/api/errors"
 	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
 )

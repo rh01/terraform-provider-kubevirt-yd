@@ -5,8 +5,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/schema/k8s"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/schema/k8s"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
 	k8sv1 "k8s.io/api/core/v1"
 	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
 )

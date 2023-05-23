@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt/utils"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

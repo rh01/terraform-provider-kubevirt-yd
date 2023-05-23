@@ -9,7 +9,7 @@ import (
 	"runtime"
 
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
-	"github.com/rh01/terraform-provider-kubevirt-yd/kubevirt"
+	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt"
 )
 
 func Serve() {
