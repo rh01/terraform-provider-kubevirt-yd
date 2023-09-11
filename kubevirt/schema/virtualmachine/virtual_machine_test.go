@@ -3,7 +3,7 @@ package virtualmachine
 import (
 	"testing"
 
-	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
+	kubevirtapiv1 "kubevirt.io/api/core/v1"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/test_utils"

@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
-	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
+	kubevirtapiv1 "kubevirt.io/api/core/v1"
 )
 
 func domainSpecFields() map[string]*schema.Schema {
@@ -318,9 +318,9 @@ func expandDiskTarget(disk []interface{}) *kubevirtapiv1.DiskTarget {
 
 	in := disk[0].(map[string]interface{})
 
-	if v, ok := in["bus"].(string); ok {
-		result.Bus = v
-	}
+	// if v, ok := in["bus"].(string); ok {
+	// 	result.Bus = v
+	// }
 	if v, ok := in["read_only"].(bool); ok {
 		result.ReadOnly = v
 	}
@@ -381,7 +381,7 @@ func expandInterfaceBindingMethod(interfaceBindingMethod string) kubevirtapiv1.I
 
 func flattenDomainSpec(in kubevirtapiv1.DomainSpec) []interface{} {
 	att := make(map[string]interface{})
-	att["machine"] = flattenMachine(in.Machine)
+	att["machine"] = flattenMachine(*in.Machine)
 	att["resources"] = flattenResources(in.Resources)
 	att["devices"] = flattenDevices(in.Devices)
 

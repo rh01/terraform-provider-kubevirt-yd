@@ -7,8 +7,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	apiresource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
-	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
+	kubevirtapiv1 "kubevirt.io/api/core/v1"
+	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 )
 
 func getExpectedVirtualMachine(name string, namespace string, source cdiv1.DataVolumeSource, labels map[string]string) *kubevirtapiv1.VirtualMachine {
@@ -30,14 +30,14 @@ func getExpectedVirtualMachine(name string, namespace string, source cdiv1.DataV
 			RunStrategy: func(src kubevirtapiv1.VirtualMachineRunStrategy) *kubevirtapiv1.VirtualMachineRunStrategy {
 				return &src
 			}(kubevirtapiv1.RunStrategyAlways),
-			DataVolumeTemplates: []cdiv1.DataVolume{
+			DataVolumeTemplates: []kubevirtapiv1.DataVolumeTemplateSpec{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      fmt.Sprintf("%s-bootvolume", name),
 						Namespace: namespace,
 					},
 					Spec: cdiv1.DataVolumeSpec{
-						Source: source,
+						Source: &source,
 						PVC: &corev1.PersistentVolumeClaimSpec{
 							AccessModes: []corev1.PersistentVolumeAccessMode{
 								"ReadWriteOnce",
@@ -82,7 +82,7 @@ func getExpectedVirtualMachine(name string, namespace string, source cdiv1.DataV
 								corev1.ResourceCPU:    apiresource.MustParse(fmt.Sprint(1)),
 							},
 						},
-						Machine: kubevirtapiv1.Machine{
+						Machine: &kubevirtapiv1.Machine{
 							Type: "q35",
 						},
 						Devices: kubevirtapiv1.Devices{

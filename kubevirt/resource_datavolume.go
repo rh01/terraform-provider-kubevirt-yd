@@ -12,7 +12,7 @@ import (
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils/patch"
 	"k8s.io/apimachinery/pkg/api/errors"
-	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
+	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 )
 
 func resourceKubevirtDataVolume() *schema.Resource {

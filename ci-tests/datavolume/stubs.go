@@ -4,7 +4,7 @@ import (
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
+	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 )
 
 func getExpectedDataVolume(name string, namespace string, source cdiv1.DataVolumeSource, labels map[string]string) *cdiv1.DataVolume {
@@ -20,7 +20,7 @@ func getExpectedDataVolume(name string, namespace string, source cdiv1.DataVolum
 			Labels:       labels,
 		},
 		Spec: cdiv1.DataVolumeSpec{
-			Source: source,
+			Source: &source,
 			PVC: &k8sv1.PersistentVolumeClaimSpec{
 				AccessModes: []k8sv1.PersistentVolumeAccessMode{
 					"ReadWriteOnce",

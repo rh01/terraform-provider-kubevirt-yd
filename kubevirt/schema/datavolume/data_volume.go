@@ -6,7 +6,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/schema/k8s"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils/patch"
-	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
+
+	kubevirtapiv1 "kubevirt.io/api/core/v1"
+	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 )
 
 func DataVolumeFields() map[string]*schema.Schema {
@@ -31,8 +33,8 @@ func DataVolumeTemplatesSchema() *schema.Schema {
 
 }
 
-func ExpandDataVolumeTemplates(dataVolumes []interface{}) ([]cdiv1.DataVolume, error) {
-	result := make([]cdiv1.DataVolume, len(dataVolumes))
+func ExpandDataVolumeTemplates(dataVolumes []interface{}) ([]kubevirtapiv1.DataVolumeTemplateSpec, error) {
+	result := make([]kubevirtapiv1.DataVolumeTemplateSpec, len(dataVolumes))
 
 	if len(dataVolumes) == 0 || dataVolumes[0] == nil {
 		return result, nil
@@ -82,7 +84,7 @@ func FromResourceData(resourceData *schema.ResourceData) (*cdiv1.DataVolume, err
 		return result, err
 	}
 	result.Spec = spec
-	result.Status = expandDataVolumeStatus(resourceData.Get("status").([]interface{}))
+	// result.Status = expandDataVolumeStatus(resourceData.Get("status").([]interface{}))
 
 	return result, nil
 }

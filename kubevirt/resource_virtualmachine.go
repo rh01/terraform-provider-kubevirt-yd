@@ -12,7 +12,7 @@ import (
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils/patch"
 	"k8s.io/apimachinery/pkg/api/errors"
-	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
+	kubevirtapiv1 "kubevirt.io/api/core/v1"
 )
 
 func resourceKubevirtVirtualMachine() *schema.Resource {

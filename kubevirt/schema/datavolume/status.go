@@ -6,7 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/utils"
-	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
+	kubevirtapiv1 "kubevirt.io/api/core/v1"
+	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 )
 
 func dataVolumeStatusFields() map[string]*schema.Schema {
@@ -59,21 +60,21 @@ func dataVolumeStatusSchema() *schema.Schema {
 
 }
 
-func expandDataVolumeStatus(dataVolumeStatus []interface{}) cdiv1.DataVolumeStatus {
-	result := cdiv1.DataVolumeStatus{}
+func expandDataVolumeStatus(dataVolumeStatus []interface{}) *kubevirtapiv1.DataVolumeTemplateDummyStatus {
+	result := &kubevirtapiv1.DataVolumeTemplateDummyStatus{}
 
 	if len(dataVolumeStatus) == 0 || dataVolumeStatus[0] == nil {
 		return result
 	}
 
-	in := dataVolumeStatus[0].(map[string]interface{})
+	// in := dataVolumeStatus[0].(map[string]interface{})
 
-	if v, ok := in["phase"].(string); ok {
-		result.Phase = cdiv1.DataVolumePhase(v)
-	}
-	if v, ok := in["progress"].(string); ok {
-		result.Progress = cdiv1.DataVolumeProgress(v)
-	}
+	// if v, ok := in["phase"].(string); ok {
+	// 	result = cdiv1.DataVolumePhase(v)
+	// }
+	// if v, ok := in["progress"].(string); ok {
+	// 	result.Progress = cdiv1.DataVolumeProgress(v)
+	// }
 
 	return result
 }

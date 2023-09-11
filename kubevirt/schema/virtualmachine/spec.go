@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/schema/datavolume"
 	"github.com/kubevirt/terraform-provider-kubevirt/kubevirt/schema/virtualmachineinstance"
-	kubevirtapiv1 "kubevirt.io/client-go/api/v1"
+	kubevirtapiv1 "kubevirt.io/api/core/v1"
 )
 
 func virtualMachineSpecFields() map[string]*schema.Schema {
@@ -80,6 +80,7 @@ func expandVirtualMachineSpec(virtualMachine []interface{}) (kubevirtapiv1.Virtu
 		if err != nil {
 			return result, err
 		}
+
 		result.DataVolumeTemplates = dataVolumeTemplates
 	}
 
@@ -98,7 +99,7 @@ func flattenVirtualMachineSpec(in kubevirtapiv1.VirtualMachineSpec) []interface{
 	if in.Template != nil {
 		att["template"] = virtualmachineinstance.FlattenVirtualMachineInstanceTemplateSpec(*in.Template)
 	}
-	att["data_volume_templates"] = datavolume.FlattenDataVolumeTemplates(in.DataVolumeTemplates)
+	// att["data_volume_templates"] = datavolume.FlattenDataVolumeTemplates(in.DataVolumeTemplates)
 
 	return []interface{}{att}
 }
