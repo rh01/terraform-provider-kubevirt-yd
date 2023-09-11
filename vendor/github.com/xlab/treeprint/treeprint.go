@@ -30,14 +30,10 @@ type Tree interface {
 	// FindByValue finds a node whose value matches the provided one by reflect.DeepEqual,
 	// returns nil if not found.
 	FindByValue(value Value) Tree
-	//  returns the last node of a tree
-	FindLastNode() Tree
 	// String renders the tree or subtree as a string.
 	String() string
 	// Bytes renders the tree or subtree as byteslice.
 	Bytes() []byte
-
-	SetValue(value Value)
 }
 
 type node struct {
@@ -45,12 +41,6 @@ type node struct {
 	Meta  MetaValue
 	Value Value
 	Nodes []*node
-}
-
-func (n *node) FindLastNode() Tree {
-	ns := n.Nodes
-	n = ns[len(ns)-1]
-	return n
 }
 
 func (n *node) AddNode(v Value) Tree {
@@ -125,20 +115,20 @@ func (n *node) FindByValue(value Value) Tree {
 func (n *node) Bytes() []byte {
 	buf := new(bytes.Buffer)
 	level := 0
-	var levelsEnded []int
+	levelEnded := make(map[int]bool)
 	if n.Root == nil {
-		buf.WriteString(fmt.Sprintf("%v",n.Value))
+		buf.WriteString(string(EdgeTypeStart))
 		buf.WriteByte('\n')
 	} else {
 		edge := EdgeTypeMid
 		if len(n.Nodes) == 0 {
 			edge = EdgeTypeEnd
-			levelsEnded = append(levelsEnded, level)
+			levelEnded[level] = true
 		}
-		printValues(buf, 0, levelsEnded, edge, n.Meta, n.Value)
+		printValues(buf, 0, levelEnded, edge, n.Meta, n.Value)
 	}
 	if len(n.Nodes) > 0 {
-		printNodes(buf, level, levelsEnded, n.Nodes)
+		printNodes(buf, level, levelEnded, n.Nodes)
 	}
 	return buf.Bytes()
 }
@@ -147,31 +137,27 @@ func (n *node) String() string {
 	return string(n.Bytes())
 }
 
-func (n *node) SetValue(value Value){
-	n.Value = value
-}
-
 func printNodes(wr io.Writer,
-	level int, levelsEnded []int, nodes []*node) {
+	level int, levelEnded map[int]bool, nodes []*node) {
 
 	for i, node := range nodes {
 		edge := EdgeTypeMid
 		if i == len(nodes)-1 {
-			levelsEnded = append(levelsEnded, level)
+			levelEnded[level] = true
 			edge = EdgeTypeEnd
 		}
-		printValues(wr, level, levelsEnded, edge, node.Meta, node.Value)
+		printValues(wr, level, levelEnded, edge, node.Meta, node.Value)
 		if len(node.Nodes) > 0 {
-			printNodes(wr, level+1, levelsEnded, node.Nodes)
+			printNodes(wr, level+1, levelEnded, node.Nodes)
 		}
 	}
 }
 
 func printValues(wr io.Writer,
-	level int, levelsEnded []int, edge EdgeType, meta MetaValue, val Value) {
+	level int, levelEnded map[int]bool, edge EdgeType, meta MetaValue, val Value) {
 
 	for i := 0; i < level; i++ {
-		if isEnded(levelsEnded, i) {
+		if levelEnded[i] {
 			fmt.Fprint(wr, "    ")
 			continue
 		}
@@ -184,23 +170,15 @@ func printValues(wr io.Writer,
 	fmt.Fprintf(wr, "%s %v\n", edge, val)
 }
 
-func isEnded(levelsEnded []int, level int) bool {
-	for _, l := range levelsEnded {
-		if l == level {
-			return true
-		}
-	}
-	return false
-}
-
 type EdgeType string
 
-var (
+const (
+	EdgeTypeStart EdgeType = "."
 	EdgeTypeLink  EdgeType = "│"
 	EdgeTypeMid   EdgeType = "├──"
 	EdgeTypeEnd   EdgeType = "└──"
 )
 
 func New() Tree {
-	return &node{Value: "."}
+	return &node{}
 }
